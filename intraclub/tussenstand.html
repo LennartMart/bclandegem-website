@@ -116,10 +116,10 @@
     <table class="table-intraclub">
       <thead>
         <tr>
-          <th></th>
-          <th>Naam</th>
-          <th></th>
-          <th>Score</th>
+          <th>#</th>
+          <th>Datum</th>
+          <th>Spelers</th>
+          <th>Gemiddelde afwezigen</th>
         </tr>
       </thead>
     </table>
@@ -140,6 +140,8 @@
         item.number +
         "</td><td>" +
         formatDate(item.date) +
+        "</td><td>" +
+        parseInt(item.matches) * 4 +
         "</td><td>" +
         item.averageAbsent +
         "</td></tr>";
