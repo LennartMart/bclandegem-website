@@ -1,0 +1,131 @@
+<link href="/components/com_jumi/files/fullcalendarv4/core/main.min.css" rel="stylesheet" />
+<link href="/components/com_jumi/files/fullcalendarv4/list/main.min.css" rel="stylesheet" />
+
+<script defer src="/components/com_jumi/files/fullcalendarv4/core/main.min.js"></script>
+<script defer src="/components/com_jumi/files/fullcalendarv4/google-calendar/main.min.js"></script>
+<script defer src="/components/com_jumi/files/fullcalendarv4/list/main.min.js"></script>
+<script
+  defer
+  src="/components/com_jumi/files/fullcalendarv4/core/locales/nl.js"
+  type="text/javascript"
+></script>
+<script defer type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    var options = {
+      plugins: ["list", "googleCalendar"],
+      defaultView: "list",
+      contentHeight: "auto",
+      duration: {
+        days: 3,
+      },
+      noEventsMessage: "",
+      displayEventEnd: false,
+      eventTimeFormat: {
+        hour: "numeric",
+        minute: "2-digit",
+        meridiem: false,
+      },
+      locale: "nl",
+      listDayFormat: {
+        month: "long",
+        year: "numeric",
+        day: "numeric",
+        weekday: "long",
+      },
+      listDayAltFormat: false,
+      header: false,
+      googleCalendarApiKey: "AIzaSyDnzhbVO9JCyQqot348j_yt9pSUYfiMHY4",
+      eventSources: [
+        //vrij spelen
+        {
+          googleCalendarId: "j7u78kbqn477fmpcsvflij80ms@group.calendar.google.com",
+          backgroundColor: "#3d998d",
+        },
+        //Training jeugd
+        {
+          googleCalendarId: "badmintonlandegem@gmail.com",
+          backgroundColor: "#727f98",
+        },
+        //intraclub
+        {
+          googleCalendarId: "ejr52sj4rumqgm8cdd4racutn4@group.calendar.google.com",
+          backgroundColor: "#8d548d",
+        },
+        //Training Competitie
+        {
+          googleCalendarId: "jrqfpmov52k09tld4a7g8t2dts@group.calendar.google.com",
+          backgroundColor: "#687582",
+        },
+        //Lessen
+        {
+          googleCalendarId: "a6c1igg3lokbd4t5934r7e656k@group.calendar.google.com",
+          backgroundColor: "#bc5477",
+        },
+        //Landegem 1H
+        {
+          googleCalendarId: "1ev895gfomaejlr5rffum91nqg@group.calendar.google.com",
+          backgroundColor: "#b04949",
+        },
+        //Landegem 2H
+        {
+          googleCalendarId: "gqilfsbiin8mcv67d8e4vp1lsk@group.calendar.google.com",
+          backgroundColor: "#bc6032",
+        },
+        //Landegem 3H
+        {
+          googleCalendarId: "e4lg65jssp6jenq7vmg6btaca4@group.calendar.google.com",
+          backgroundColor: "#c78226",
+        },
+        //Landegem 4H
+        {
+          googleCalendarId: "u7nlkulc25vkh6qmuoo2os5fcc@group.calendar.google.com",
+          backgroundColor: "#fa9000",
+        },
+        //Landegem 1G
+        {
+          googleCalendarId: "asu1p541taq489bduc0gfembt4@group.calendar.google.com",
+          backgroundColor: "#488968",
+        },
+        //Landegem 2G
+        {
+          googleCalendarId: "phuq1joltk4msks0sa9k4j7iqg@group.calendar.google.com",
+          backgroundColor: "#318c36",
+        },
+        //Landegem 3G
+        {
+          googleCalendarId: "crqd22q339k00841t1id0031nc@group.calendar.google.com",
+          backgroundColor: "#6b9926",
+        },
+        //Landegem 4G
+        {
+          googleCalendarId: "luk9nh66ttsg0fvkfc9o5p5clc@group.calendar.google.com",
+          backgroundColor: "#59BFB3",
+        },
+        //Landegem 1D
+        {
+          googleCalendarId: "kqdiu9vh0u7jo47169pagfl4c4@group.calendar.google.com",
+          backgroundColor: "#496b8d",
+        },
+        //Landegem 2D
+        {
+          googleCalendarId: "547rgbk4pbom2hlrra6su5kb58@group.calendar.google.com",
+          backgroundColor: "#496bb0",
+        },
+        //Training Recreanten
+        {
+          googleCalendarId: "22m1pqspb1tlr688orr685hl6o@group.calendar.google.com",
+          backgroundColor: "#BF5FFF",
+        },
+      ],
+      timeZone: "Europe/Brussels",
+    };
+    var calendarEl = document.getElementById("listcalendar");
+    var calendar = new FullCalendar.Calendar(calendarEl, options);
+    calendar.render();
+  });
+</script>
+<div id="listcalendar" class="listcalendar">&nbsp;</div>
+<div style="margin-top: 10px;" class="right-bottomlink">
+  <em class="fa fa-arrow-right fa-lg" style="margin-right: 10px;"></em
+  ><a href="/kalender">Volledige kalender</a>
+</div>

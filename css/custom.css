@@ -1,0 +1,295 @@
+/*om-content .edit fieldset .joomla-tabs .nav-item a {
+  display: block !important;
+}*/
+a {
+  cursor: pointer;
+}
+h4 {
+  color: #ccc;
+}
+#sp-bbanner {
+  background-color: #fdfafa;
+}
+#sp-top-bar {
+  background: #eb0000;
+}
+#sp-main-body {
+  padding: 0px;
+  background-color: #fdfafa;
+}
+#sp-main-body .container {
+  padding: 25px 0px;
+  background-color: white;
+}
+
+#sp-right .sp-module {
+  margin-top: 10px;
+}
+
+#sp-right .sp-module {
+  padding: 20px;
+}
+#sp-right .sp-module .sp-module-title {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+#editor-xtd-buttons {
+  margin-bottom: 10px;
+}
+
+.article-details .article-can-edit a {
+  background-color: #eb0000;
+}
+
+.borderless {
+  border: none !important;
+}
+
+@media (min-width: 768px) {
+  .logo-image {
+    display: none;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1600px;
+  }
+  body.helix-ultimate .sppb-row-container {
+    max-width: 1600px;
+  }
+  .sppb-row-container {
+    width: 100%;
+  }
+}
+.bgimage {
+  width: 100%;
+  height: 300px;
+  background: url("https://images.unsplash.com/photo-1438109491414-7198515b166b?q=80&fm=jpg&s=cbdabf7a79c087a0b060670a6d79726c");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+.bgimage h5 {
+  color: white;
+  text-shadow: 2px 2px #333;
+  font-size: 50px;
+}
+
+.bgimage a {
+  color: white;
+  text-shadow: 2px 2px #333;
+  font-size: 35px;
+  text-decoration: underline;
+}
+
+@media (max-width: 400px) {
+  .bgimage h5 {
+    font-size: 40px;
+  }
+
+  .bgimage a {
+    font-size: 30px;
+  }
+}
+
+/*.offcanvas-menu .offcanvas-inner .sp-module ul > li ul {display: block;}*/
+
+.blog-featured .row.items-row,
+.blog-featured .items-leading {
+  border-bottom: 1px solid #eb0000;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+@media (min-width: 750px) {
+  .blog-featured .items-row .column-1 {
+    border-right: 1px solid #eb0000;
+  }
+}
+/* Menu */
+.sp-megamenu-parent > li > a {
+  font-size: 16px;
+}
+
+/* OffCanvas Menu */
+.offcanvas-menu .bcl-icon::before {
+  font-family: "Font Awesome\ 5 Free";
+  display: inline-block;
+  margin-right: 0.33em;
+  font-weight: 900;
+  font-size: 1em;
+  text-align: center;
+  width: 1.25em;
+}
+.offcanvas-menu .bcl-icon.bcl-icon-home::before {
+  content: "\f015";
+}
+.offcanvas-menu .bcl-icon.bcl-icon-club::before {
+  content: "\f05a";
+}
+.offcanvas-menu .bcl-icon.bcl-icon-become-member::before {
+  content: "\f0e7";
+}
+.offcanvas-menu .bcl-icon.bcl-icon-competition::before {
+  content: "\f005";
+}
+.offcanvas-menu .bcl-icon.bcl-icon-youth::before {
+  content: "\f1ae";
+}
+.offcanvas-menu .bcl-icon.bcl-icon-calendar::before {
+  content: "\f073";
+}
+.offcanvas-menu .bcl-icon.bcl-icon-media::before {
+  content: "\f03e";
+}
+.offcanvas-menu .bcl-icon.bcl-icon-intraclub::before {
+  content: "\f012";
+}
+
+/* Modules */
+#sp-right .sp-module.borderless {
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+.frontpagemodule {
+  background-color: #eb0000;
+  color: white;
+  clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
+}
+.frontpagemodule a {
+  color: white;
+  text-decoration: underline;
+}
+
+.frontpagemodule.grey {
+  background-color: #cccccc;
+  color: black;
+}
+
+.frontpagemodule.sp-module ul > li > a {
+  color: white;
+}
+.frontpagemodule.grey a {
+  background-color: white;
+  color: black;
+  padding: 5px;
+}
+/* Frontpage Intra */
+#intratop10 {
+  width: 90%;
+}
+#intratop10 .rank {
+  color: black;
+  font-weight: bold;
+}
+/* Frontpage Calendar & full calendar mobile */
+.listcalendar.fc-unthemed .fc-list-empty {
+  background-color: #eb0000;
+}
+.listcalendar.fc-unthemed .fc-list-item-marker,
+.listfullcalendar.fc-unthemed .fc-list-item-marker,
+.fc-unthemed .fc-listMonth-view .fc-list-item-marker {
+  display: none;
+}
+
+.listcalendar.fc-unthemed tbody {
+  border-color: #eb0000;
+}
+.listcalendar.fc-unthemed .fc-list-item {
+  color: white;
+}
+.listcalendar.fc-unthemed .fc-widget-header,
+.listcalendar.fc-unthemed .fc-list-heading td {
+  background-color: #eb0000;
+  color: black;
+}
+.listfullcalendar.fc-unthemed .fc-widget-header,
+.listfullcalendar.fc-unthemed .fc-list-heading td,
+.fc-unthemed .fc-listMonth-view .fc-widget-header,
+.fc-unthemed .fc-listMonth-view .fc-list-heading td {
+  background-color: #eb0000;
+  color: white;
+}
+.listcalendar.fc-unthemed .fc-list-view {
+  border: 0px;
+}
+.listcalendar.fc-unthemed .fc-list-table td {
+  padding: 2px 14px;
+  border: 0px;
+  background-color: #eb0000;
+}
+
+.listcalendar.fc-unthemed .fc-list-item:hover td {
+  background-color: #eb0000;
+}
+
+.listcalendar.fc-unthemed .fc-list-heading-main {
+  text-transform: uppercase;
+}
+
+.right-titlelink {
+  float: right;
+  font-size: 16px;
+}
+a.right-titlelink:before {
+  font-family: "Font Awesome\ 5 Free";
+  content: "\f061";
+  display: inline-block;
+  padding-right: 3px;
+  vertical-align: middle;
+  font-weight: 900;
+  margin-right: 5px;
+  font-size: 1.33333333em;
+}
+.right-bottomlink {
+  display: none;
+}
+@media (max-width: 1200px) {
+  .right-titlelink {
+    display: none;
+  }
+  .right-bottomlink {
+    display: block;
+  }
+}
+/* General Calendar */
+.fc-day-header,
+.fc-header-toolbar {
+  text-transform: capitalize;
+}
+
+.fc-ltr .fc-basic-view .fc-day-top .fc-day-number {
+  float: left !important;
+}
+
+.fc-head-container.fc-widget-header {
+  border-color: white;
+}
+.fc-head-container.fc-widget-header .fc-row.fc-widget-header table thead tr th {
+  border-color: white;
+}
+
+.fc-unthemed td.fc-today {
+  background-color: rgb(241, 243, 244) !important;
+}
+/* Comments */
+#comments-form img.smile,
+.comment-body img {
+  display: initial;
+}
+
+#jc span.comments-vote {
+  margin-right: 5px;
+}
+
+/* Articles */
+.article-details {
+  margin-left: 10px;
+}
+
+/* Contact */
+.contact {
+  margin-left: 10px;
+}
