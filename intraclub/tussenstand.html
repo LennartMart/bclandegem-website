@@ -20,6 +20,12 @@
   .table-intraclub tr:last-child {
     border-bottom: 0px;
   }
+  .table-intraclub a {
+    color: black;
+  }
+  .table-intraclub a:focus {
+    color: #eb0000;
+  }
   .hover {
     background-color: #ccc !important;
     cursor: pointer;
@@ -154,11 +160,13 @@
       trHtml +=
         "<tr><td>" +
         item.rank +
-        "</td><td>" +
+        "</td><td><a href='/intraclub/speler?spelerId=" +
+        item.id +
+        "'>" +
         item.firstName +
         " " +
         item.name +
-        '</td><td style="min-width: 60px;">' +
+        '</a></td><td style="min-width: 60px;">' +
         formatDifferenceCell(item.difference) +
         "</td><td>" +
         item.average +

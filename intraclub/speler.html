@@ -1,5 +1,29 @@
-<div style="margin: 5px 5px;">
-  <h3>Jelle Van Tornhout</h3>
+<style type="text/css">
+  #speler-intro {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+  }
+  #speler-voornaam {
+    font-size: 20px;
+  }
+  #speler-naam,
+  #huidigeRanking {
+    font-size: 30px;
+  }
+</style>
+<div id="spelerInformatie" style="margin: 5px 5px;">
+  <div id="speler-intro">
+    <div class="speler-hero-naam">
+      <div id="speler-voornaam"></div>
+      <div id="speler-naam"></div>
+    </div>
+    <div>
+      <div id="huidigeRanking"></div>
+      <div id="hoogsteRankingOoit"></div>
+    </div>
+  </div>
+
   <div id="chartsRow" style="display: flex; flex-wrap: wrap; justify-content: space-evenly;">
     <div id="chartAanwezig" style="max-width: 300px;"></div>
     <div id="chartMatchen" style="max-width: 300px;"></div>
@@ -9,6 +33,80 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const spelerId = urlParams.get("spelerId");
+  var request = new XMLHttpRequest();
+  request.open("GET", "/intraclub-api/index.php/players/" + spelerId, true);
+
+  request.onload = function () {
+    if (this.status >= 200 && this.status < 400) {
+      // Success!
+      var data = JSON.parse(this.response);
+      document.getElementById("speler-voornaam").innerText = data.firstName;
+      document.getElementById("speler-naam").innerText = data.name;
+      const [huidigeRanking] = data.statistics.rankingHistory.slice(-1);
+      if (huidigeRanking) {
+        document.getElementById("huidigeRanking").innerText = "Ranking: " + huidigeRanking.rank;
+        const hoogsteRankschikking = Math.min.apply(
+          Math,
+          data.statistics.rankingHistory.map(function (o) {
+            return o.rank;
+          })
+        );
+        const laatsteSpeeldagMetHoogsteRankschikking = data.statistics.rankingHistory
+          .slice()
+          .reverse()
+          .find((rankHis) => rankHis.rank === hoogsteRankschikking);
+        document.getElementById("hoogsteRankingOoit").innerText =
+          "Beste : " +
+          hoogsteRankschikking +
+          " (op speeldag " +
+          laatsteSpeeldagMetHoogsteRankschikking.number +
+          ")";
+      }
+
+      const aanwezigPercentage = calculatePercentage(
+        data.statistics.rounds.present,
+        data.statistics.rankingHistory.length
+      );
+      var chartAanwezig = basicChart;
+      chartAanwezig.series = [aanwezigPercentage];
+      chartAanwezig.labels = ["Aanwezig"];
+      new ApexCharts(document.querySelector("#chartAanwezig"), chartAanwezig).render();
+      const winstmatchPercentage = calculatePercentage(
+        data.statistics.matches.won,
+        data.statistics.matches.total
+      );
+
+      var chartMatchen = basicChart;
+      chartMatchen.series = [winstmatchPercentage];
+      chartMatchen.labels = ["Gewonnen"];
+      new ApexCharts(document.querySelector("#chartMatchen"), chartMatchen).render();
+
+      const winstsetPercentage = calculatePercentage(
+        data.statistics.sets.won,
+        data.statistics.sets.total
+      );
+      var chartSets = basicChart;
+      chartSets.series = [winstsetPercentage];
+      chartSets.labels = ["Sets"];
+      new ApexCharts(document.querySelector("#chartSets"), chartSets).render();
+      rankingHistory.series[0].data = data.statistics.rankingHistory.map((rh) => rh.rank);
+      rankingHistory.xaxis.categories = data.statistics.rankingHistory.map((rh) =>
+        rh.number.toString()
+      );
+      new ApexCharts(document.querySelector("#rankingHistory"), rankingHistory).render();
+    } else {
+      // We reached our target server, but it returned an error
+      document.getElementById("spelerInformatie").innerText = "Woeps, er ging iets mis!";
+    }
+  };
+
+  request.onerror = function () {
+    // There was a connection error of some sort
+    document.getElementById("intratop10").innerText = "De tussenstand kon niet geladen worden";
+  };
+  request.send();
   var basicChart = {
     colors: ["#eb0000"],
     chart: {
@@ -62,30 +160,11 @@
       },
     },
   };
-  var chartAanwezig = basicChart;
-  chartAanwezig.series = [100];
-  chartAanwezig.labels = ["Aanwezig"];
-  new ApexCharts(document.querySelector("#chartAanwezig"), chartAanwezig).render();
-  var chartMatchen = basicChart;
-  chartMatchen.series = [83];
-  chartMatchen.labels = ["Gewonnen"];
-  new ApexCharts(document.querySelector("#chartMatchen"), chartMatchen).render();
-
-  var chartSets = basicChart;
-  chartSets.series = [80];
-  chartSets.labels = ["Sets"];
-  new ApexCharts(document.querySelector("#chartSets"), chartSets).render();
-
-  //   var chartPunten = basicChart;
-  //   chartPunten.series = [51];
-  //   chartPunten.labels = ["Punten"];
-  //   new ApexCharts(document.querySelector("#chartPunten"), chartSets).render();
-
   var rankingHistory = {
     series: [
       {
         name: "Ranking",
-        data: [4, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1],
+        data: [],
       },
     ],
     colors: ["#eb0000"],
@@ -123,7 +202,7 @@
       },
     },
     xaxis: {
-      categories: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      categories: [],
       title: {
         text: "Speeldag",
         style: {
@@ -149,5 +228,14 @@
       },
     },
   };
-  new ApexCharts(document.querySelector("#rankingHistory"), rankingHistory).render();
+
+  function calculatePercentage(amount, total) {
+    if (isNaN(amount) || isNaN(total)) {
+      return 0;
+    } else if (total == 0) {
+      return 0;
+    } else {
+      return ((amount / total) * 100).toFixed(0);
+    }
+  }
 </script>
