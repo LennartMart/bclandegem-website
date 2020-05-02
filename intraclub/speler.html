@@ -1,0 +1,153 @@
+<div style="margin: 5px 5px;">
+  <h3>Jelle Van Tornhout</h3>
+  <div id="chartsRow" style="display: flex; flex-wrap: wrap; justify-content: space-evenly;">
+    <div id="chartAanwezig" style="max-width: 300px;"></div>
+    <div id="chartMatchen" style="max-width: 300px;"></div>
+    <div id="chartSets" style="max-width: 300px;"></div>
+  </div>
+  <div id="rankingHistory"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+  var basicChart = {
+    colors: ["#eb0000"],
+    chart: {
+      type: "radialBar",
+      offsetY: -20,
+      sparkline: {
+        enabled: true,
+      },
+    },
+    plotOptions: {
+      radialBar: {
+        startAngle: -90,
+        endAngle: 90,
+        track: {
+          background: "#e7e7e7",
+          strokeWidth: "97%",
+          margin: 5, // margin is in pixels
+          dropShadow: {
+            enabled: true,
+            top: 2,
+            left: 0,
+            opacity: 1,
+            blur: 2,
+          },
+        },
+        dataLabels: {
+          name: {
+            offsetY: -25,
+            show: true,
+          },
+          value: {
+            offsetY: -16,
+            fontSize: "22px",
+          },
+        },
+      },
+    },
+    grid: {
+      padding: {
+        top: -10,
+        bottom: 20,
+      },
+    },
+    fill: {
+      type: "gradient",
+      gradient: {
+        shade: "dark",
+        type: "horizontal",
+        gradientToColors: ["yellow"],
+        stops: [0, 100],
+      },
+    },
+  };
+  var chartAanwezig = basicChart;
+  chartAanwezig.series = [100];
+  chartAanwezig.labels = ["Aanwezig"];
+  new ApexCharts(document.querySelector("#chartAanwezig"), chartAanwezig).render();
+  var chartMatchen = basicChart;
+  chartMatchen.series = [83];
+  chartMatchen.labels = ["Gewonnen"];
+  new ApexCharts(document.querySelector("#chartMatchen"), chartMatchen).render();
+
+  var chartSets = basicChart;
+  chartSets.series = [80];
+  chartSets.labels = ["Sets"];
+  new ApexCharts(document.querySelector("#chartSets"), chartSets).render();
+
+  //   var chartPunten = basicChart;
+  //   chartPunten.series = [51];
+  //   chartPunten.labels = ["Punten"];
+  //   new ApexCharts(document.querySelector("#chartPunten"), chartSets).render();
+
+  var rankingHistory = {
+    series: [
+      {
+        name: "Ranking",
+        data: [4, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1],
+      },
+    ],
+    colors: ["#eb0000"],
+    chart: {
+      height: 350,
+      type: "line",
+      zoom: {
+        enabled: false,
+      },
+      toolbar: {
+        show: false,
+      },
+    },
+    markers: {
+      size: 4,
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: "straight",
+    },
+    title: {
+      text: "Klassement geschiedenis",
+      align: "left",
+      style: {
+        fontSize: "16px",
+        color: "#666",
+      },
+    },
+    grid: {
+      row: {
+        colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+        opacity: 0.5,
+      },
+    },
+    xaxis: {
+      categories: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      title: {
+        text: "Speeldag",
+        style: {
+          fontSize: "16px",
+          color: "#666",
+        },
+      },
+    },
+    yaxis: {
+      reversed: true,
+      labels: {
+        formatter: function (val, index) {
+          return val.toFixed(0);
+        },
+      },
+    },
+    tooltip: {
+      x: {
+        show: true,
+        formatter: function (val) {
+          return "Speeldag " + val;
+        },
+      },
+    },
+  };
+  new ApexCharts(document.querySelector("#rankingHistory"), rankingHistory).render();
+</script>
