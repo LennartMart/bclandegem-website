@@ -1,3 +1,9 @@
+<style type="text/css">
+  .fullName a {
+    text-decoration: none;
+  }
+</style>
+
 <table id="intratop10">
   &nbsp;
 </table>
@@ -32,15 +38,24 @@
       let row = table.insertRow();
       insertCell(row, element.rank, "rank");
       insertCell(row, formatDifference(element.difference), "difference");
-      insertCell(row, element.firstName + " " + element.name, "fullName");
+      insertCell(
+        row,
+        "<a href='/intraclub/speler?spelerId=" +
+          element.id +
+          "'>" +
+          element.firstName +
+          " " +
+          element.name +
+          "</a>",
+        "fullName"
+      );
       insertCell(row, element.average, "average");
     }
   }
   function insertCell(row, cellText, className) {
     let cell = row.insertCell();
-    let text = document.createTextNode(cellText);
     cell.className = className;
-    cell.appendChild(text);
+    cell.innerHTML = cellText;
   }
   function formatDifference(difference) {
     if (difference > 0) {
