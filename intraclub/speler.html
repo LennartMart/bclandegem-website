@@ -8,10 +8,10 @@
     color: #666;
     padding-bottom: 25px;
   }
-  #speler-voornaam {
+  #speler-naam {
     font-size: 20px;
   }
-  #speler-naam,
+  #speler-voornaam,
   #huidigeRanking {
     font-size: 30px;
   }
@@ -39,12 +39,7 @@
   #wedstrijdenSpelerDiv {
     display: none;
     justify-content: center;
-  }
-  #wedstrijdenSpeler a {
-    color: black;
-  }
-  #wedstrijdenSpeler a {
-    color: #eb0000;
+    overflow-x: auto;
   }
 </style>
 <div id="spelerInformatie" style="margin: 5px 5px;">
@@ -74,7 +69,6 @@
           <th></th>
           <th></th>
           <th></th>
-          <th>Ranking</th>
         </tr>
       </thead>
     </table>
@@ -323,7 +317,7 @@
         element.round.id,
         rankingHistory
       );
-      insertCell(row, overeenkomstigeRankingHistory.rank, "rank");
+      //insertCell(row, overeenkomstigeRankingHistory.rank, "rank");
     }
   }
   function haalRankingGeschiedenisOp(rondeId, rankingHistory) {
