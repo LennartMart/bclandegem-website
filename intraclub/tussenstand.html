@@ -160,15 +160,23 @@
     trHtml = "";
     jQuery.each(data.reverse(), function (i, item) {
       trHtml +=
-        "<tr><td>" +
+        "<tr><td><a href='/intraclub/speeldag?speeldagId=" +
+        item.id +
+        "'>" +
         item.number +
-        "</td><td>" +
+        "</a></td><td><a href='/intraclub/speeldag?speeldagId=" +
+        item.id +
+        "'>" +
         formatDate(item.date) +
-        "</td><td>" +
+        "</a></td><td><a href='/intraclub/speeldag?speeldagId=" +
+        item.id +
+        "'>" +
         parseInt(item.matches) * 4 +
-        "</td><td style='width: 15em;'>" +
+        "</a></td><td style='width: 15em;'><a href='/intraclub/speeldag?speeldagId=" +
+        item.id +
+        "'>" +
         item.averageAbsent +
-        "</td></tr>";
+        "</a></td></tr>";
     });
     jQuery("#tab-5 table").append(trHtml);
   });
@@ -198,6 +206,13 @@
     });
     jQuery("#tab-6 table").append(trHtml);
   });
+  if (location.hash && document.querySelector("[data-tab='" + location.hash.substr(1) + "']")) {
+    jQuery("ul.tabs li").removeClass("current");
+    jQuery(".tab-content").removeClass("current");
+    document.querySelector("[data-tab='" + location.hash.substr(1) + "']").classList.add("current");
+    jQuery(location.hash).addClass("current");
+  }
+
   function generateRanking(data, seasonId, tabId) {
     trHtml = "";
     jQuery.each(data, function (i, item) {
@@ -246,6 +261,7 @@
     jQuery(".tab-content").removeClass("current");
     jQuery(this).addClass("current");
     jQuery("#" + tab_id).addClass("current");
+    history.pushState(null, null, "#" + tab_id);
   });
   function sortTable(n) {
     var table,
