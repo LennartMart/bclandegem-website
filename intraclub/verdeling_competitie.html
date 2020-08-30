@@ -1,0 +1,446 @@
+<div class="knoppen">
+  <input
+    id="knopBerekenMatchen"
+    type="button"
+    onclick="berekenMatchen()"
+    value="Bereken wedstrijden"
+    class="btn btn-primary"
+  />
+
+  <input class="btn" id="knopToonSpelers" type="button" value="Toggle spelers" />
+
+  <input
+    class="btn btn-secondary"
+    id="knopTelAanwezigen"
+    type="button"
+    value="Tel aanwezigen"
+    onclick="telAanwezigen()"
+  />
+</div>
+
+<ol id="spelerslijst"></ol>
+
+<div id="matchen" style="display: none"></div>
+
+<style>
+  .knoppen {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+  .knoppen input {
+    margin: 6px 4px 6px 4px;
+  }
+</style>
+
+<script language="javascript">
+  window.onbeforeunload = function () {
+    return "Matchen en aangeduide spelers zullen verloren gaan.";
+  };
+
+  var request = new XMLHttpRequest();
+  request.open("GET", "/intraclub-api/index.php/rankings/general", true);
+
+  request.onload = function () {
+    if (this.status >= 200 && this.status < 400) {
+      // Success!
+      var data = JSON.parse(this.response);
+      var list = document.getElementById("spelerslijst");
+      genereerSpelersLijst(list, data.general);
+      voegNieuweSpelersToeAanLijst(list);
+    } else {
+      // We reached our target server, but it returned an error
+      document.getElementById("spelerslijst").innerText = "De spelerslijst kon niet geladen worden";
+    }
+  };
+
+  request.onerror = function () {
+    // There was a connection error of some sort
+    document.getElementById("spelerslijst").innerText = "De spelerslijst kon niet geladen worden";
+  };
+  request.send();
+
+  function genereerSpelersLijst(list, data) {
+    for (let element of data) {
+      const li = document.createElement("li");
+
+      maakInput(li, "checkbox", element.firstName + " " + element.name, element.id, element.id);
+      maakLabel(li, element.id, "&nbsp;" + element.firstName + " " + element.name);
+
+      list.appendChild(li);
+    }
+  }
+
+  function voegNieuweSpelersToeAanLijst(list) {
+    for (var nieuweSpelerIndex = 0; nieuweSpelerIndex < 4; nieuweSpelerIndex++) {
+      const li = document.createElement("li");
+
+      maakInput(li, "checkbox", "nieuwe_speler", "nieuwe_speler_" + nieuweSpelerIndex, "");
+
+      maakLabel(li, "nieuwe_speler_voornaam_" + nieuweSpelerIndex, "&nbsp;Voornaam:");
+      maakInput(
+        li,
+        "textbox",
+        "nieuwe_speler_voornaam",
+        "voornaam_nieuwe_speler_" + nieuweSpelerIndex,
+        ""
+      );
+
+      maakLabel(li, "nieuwe_speler_naam_" + nieuweSpelerIndex, "&nbsp;Naam:");
+      maakInput(li, "textbox", "nieuwe_speler_naam", "naam_nieuwe_speler_" + nieuweSpelerIndex, "");
+
+      var input = document.createElement("input");
+      input.id = "nieuwe_speler_" + nieuweSpelerIndex;
+      input.type = "button";
+      input.value = "OK";
+      input.onclick = function () {
+        voegSpelerToe(
+          li, this.id
+        );
+      };
+
+      li.appendChild(input);
+
+      list.appendChild(li);
+    }
+  }
+
+  function maakLabel(parent, htmlFor, innerHTML) {
+    var label = document.createElement("label");
+    label.htmlFor = htmlFor;
+    label.innerHTML = innerHTML;
+    parent.appendChild(label);
+  }
+  function maakInput(parent, type, name, id, value) {
+    var input = document.createElement("input");
+    input.type = type;
+    input.name = name;
+    input.id = id;
+    input.value = value;
+
+    parent.appendChild(input);
+  }
+
+  function berekenMatchen() {
+    var matchenPerPoule = 3;
+
+    var aanwezigeSpelers = new Array(); // array met de ID's en namen van de aanwezige spelers
+    var wedstrijdArray = new Array(); // array met alle wedstrijden: wedstrijdArray[match nummer][teamX_spelerX] = array {ID, naam}
+    var geselecteerdeSpelers = new Array(); // array met de spelers die geselecteerd zijn voor een 2de match te spelen.
+    var spelersLijstVoorDropdown = new Array(); //Dropdown, indien er géén speler toegekend is op die positie
+
+    var result = confirm("Wil je de wedstrijden verdelen?");
+    if (result == false) {
+      return;
+    }
+
+    document.getElementById("spelerslijst").style.display = "none";
+    document.getElementById("matchen").style.display = "block";
+    document.getElementById("knopBerekenMatchen").value = "Herloot de matchen";
+
+    // array aanwezigeSpelers invullen met het ID en de naam van de aanwezige spelers
+    var aanwezigeSpelersIndex = 0;
+    for (
+      var spelersIndex = 0;
+      spelersIndex < document.getElementById("spelerslijst").getElementsByTagName("INPUT").length;
+      spelersIndex++
+    ) {
+      if (
+        document.getElementById("spelerslijst").getElementsByTagName("INPUT")[spelersIndex].type ==
+        "checkbox"
+      ) {
+        if (
+          document.getElementById("spelerslijst").getElementsByTagName("INPUT")[spelersIndex]
+            .checked
+        ) {
+          aanwezigeSpelers[aanwezigeSpelersIndex] = new Array();
+          aanwezigeSpelers[aanwezigeSpelersIndex]["ID"] = document
+            .getElementById("spelerslijst")
+            .getElementsByTagName("INPUT")[spelersIndex].value;
+          aanwezigeSpelers[aanwezigeSpelersIndex]["naam"] = document
+            .getElementById("spelerslijst")
+            .getElementsByTagName("INPUT")[spelersIndex].name;
+          aanwezigeSpelersIndex++;
+        }
+      }
+    }
+    // Alle aanwezige spelers zitten in aanwezigeSpelers
+
+    //Eerst: dropdownlist om eventueel te kunnen aanvullen
+    spelersLijstVoorDropdown = aanwezigeSpelers.slice();
+
+    var matchNummer = 0; // volgnummer van de match (1ste = 0)
+
+    // matchen verdelen
+    for (
+      var pouleIndex = 0;
+      pouleIndex < Math.floor(spelersLijstVoorDropdown.length / (matchenPerPoule * 4));
+      pouleIndex++
+    ) {
+      //Neem het aantal spelers voor in de poule
+      var pouleSpelers = aanwezigeSpelers.splice(0, matchenPerPoule * 4);
+      //Handicap toevoegen
+      pouleSpelers = BerekenHandicap(pouleSpelers);
+
+      //Nu de poule compleet door elkaar halen.
+      pouleSpelers = MaakSpelersArrayRandom(pouleSpelers);
+
+      for (var matchIndex = 0; matchIndex < matchenPerPoule; matchIndex++) {
+        // j = match in een poule
+        wedstrijdArray[matchNummer] = new Array();
+        wedstrijdArray[matchNummer]["team1_speler1"] = pouleSpelers[4 * matchIndex];
+        wedstrijdArray[matchNummer]["team1_speler2"] = pouleSpelers[4 * matchIndex + 1];
+        wedstrijdArray[matchNummer]["team2_speler1"] = pouleSpelers[4 * matchIndex + 2];
+        wedstrijdArray[matchNummer]["team2_speler2"] = pouleSpelers[4 * matchIndex + 3];
+        wedstrijdArray[matchNummer]["handicap_team1"] =
+          pouleSpelers[4 * matchIndex]["handicap"] +
+          pouleSpelers[4 * matchIndex + 1]["handicap"] -
+          (pouleSpelers[4 * matchIndex + 2]["handicap"] +
+            pouleSpelers[4 * matchIndex + 3]["handicap"]);
+
+        matchNummer++;
+      }
+    }
+
+    // Vanaf hier zijn alle "volledige" poules berekend.
+    // nu zit er in aanwezigeSpelers diegene die nog NIET in een match zitten.
+
+    // resterende poule verdelen
+    // We hebben nu max poule -1 spelers over
+    if (aanwezigeSpelers.length % (matchenPerPoule * 4) != 0) {
+      aanwezigeSpelers = BerekenHandicap(aanwezigeSpelers);
+      pouleSpelers = MaakSpelersArrayRandom(aanwezigeSpelers);
+
+      for (var i = 0; i < Math.floor((aanwezigeSpelers.length % (4 * matchenPerPoule)) / 4); i++) {
+        // matchen van 4 spelers die nog niet gespeeld hebben.
+        wedstrijdArray[matchNummer] = new Array();
+        wedstrijdArray[matchNummer]["team1_speler1"] = pouleSpelers[4 * i];
+        wedstrijdArray[matchNummer]["team1_speler2"] = pouleSpelers[4 * i + 1];
+        wedstrijdArray[matchNummer]["team2_speler1"] = pouleSpelers[4 * i + 2];
+        wedstrijdArray[matchNummer]["team2_speler2"] = pouleSpelers[4 * i + 3];
+        wedstrijdArray[matchNummer]["handicap_team1"] =
+          pouleSpelers[4 * i]["handicap"] +
+          pouleSpelers[4 * i + 1]["handicap"] -
+          (pouleSpelers[4 * i + 2]["handicap"] + pouleSpelers[4 * i + 3]["handicap"]);
+
+        matchNummer++;
+      }
+
+      if (pouleSpelers.length % 4 != 0) {
+        // Nu hebben we alle mogelijke matchen er nog uitgehaald
+        if (pouleSpelers.length - (pouleSpelers.length % 4) >= 4) {
+          pouleSpelers.splice(0, pouleSpelers.length - (pouleSpelers.length % 4));
+        }
+        // Nu hebben we minder dan vier spelers over
+        // Laatste verdelen
+        // We hebben minimaal één speler over!
+        wedstrijdArray[matchNummer] = new Array();
+        wedstrijdArray[matchNummer]["team1_speler1"] = pouleSpelers[0];
+
+        if (2 <= pouleSpelers.length % 4) {
+          wedstrijdArray[matchNummer]["team2_speler1"] = pouleSpelers[1];
+          if (3 <= pouleSpelers.length % 4) {
+            wedstrijdArray[matchNummer]["team1_speler2"] = pouleSpelers[2];
+          }
+        }
+        matchNummer++;
+      }
+    }
+
+    // We hebben alle matchen, nu verwerken in output
+
+    var output = "<table class='table table-striped'>";
+    output +=
+      "<thead><tr><th></th><th></th><th>Handicap</th><th COLSPAN='2'>Set 1</th><th COLSPAN='2'>Set 2</th><th COLSPAN='2'>Set 3</th></tr></thead>";
+    for (var i = 0; i < matchNummer; i++) {
+      output += "<tr>";
+      output += "<td>" + outputSpeler(wedstrijdArray[i]["team1_speler1"]);
+      if (wedstrijdArray[i]["team1_speler2"] != null) {
+        output += "<br/>" + outputSpeler(wedstrijdArray[i]["team1_speler2"]) + "</td>";
+      } else {
+        var nummer = "1_2";
+        output +=
+          "<br/><span id ='span_" +
+          nummer +
+          "'>" +
+          dropdownSpelerslijst(spelersLijstVoorDropdown, nummer) +
+          "</span>";
+        output +=
+          "<input class='btn btn-ok' id='knop_" +
+          nummer +
+          "' type='button' value='OK' onClick=\"" +
+          "selectSpeler('" +
+          nummer +
+          "')\"\>";
+      }
+
+      if (wedstrijdArray[i]["team2_speler1"] != null) {
+        output += "<td>" + outputSpeler(wedstrijdArray[i]["team2_speler1"]);
+      } else {
+        var nummer = "2_1";
+        output +=
+          "<td><span id ='span_" +
+          nummer +
+          "'>" +
+          dropdownSpelerslijst(spelersLijstVoorDropdown, nummer) +
+          "</span>";
+        output +=
+          "<input class='btn btn-ok' id='knop_" +
+          nummer +
+          "' type='button' value='OK' onClick=\"" +
+          "selectSpeler('" +
+          nummer +
+          "')\"\>";
+      }
+      if (wedstrijdArray[i]["team2_speler2"] != null) {
+        output += "<br/>" + outputSpeler(wedstrijdArray[i]["team2_speler2"]) + "</td>";
+      } else {
+        var nummer = "2_2";
+        output +=
+          "<br/><span id ='span_" +
+          nummer +
+          "'>" +
+          dropdownSpelerslijst(spelersLijstVoorDropdown, nummer) +
+          "</span>";
+        output +=
+          "<input class='btn btn-ok' id='knop_" +
+          nummer +
+          "' type='button' value='OK' onClick=\"" +
+          "selectSpeler('" +
+          nummer +
+          "')\"\></td>";
+      }
+
+      if (wedstrijdArray[i]["handicap_team1"] != null) {
+        if (wedstrijdArray[i]["handicap_team1"] > 0) {
+          output += "<td> (0 - " + wedstrijdArray[i]["handicap_team1"] * -1 + ")</td>";
+        } else if (wedstrijdArray[i]["handicap_team1"] <= 0) {
+          output += "<td> (" + wedstrijdArray[i]["handicap_team1"] + " - 0)</td>";
+        }
+      } else {
+        output += "<td>Handicap zelf te berekenen</td>";
+      }
+      output += inputSets();
+      output += "</tr>";
+    }
+
+    document.getElementById("matchen").innerHTML = output;
+  }
+
+  function dropdownSpelerslijst(array, nummer) {
+    var output = "<select value='lijst' id='select_" + nummer + "'>";
+    for (var i = 0; i < array.length; i++) {
+      output += "<option id='" + array[i]["ID"] + "'>" + array[i]["naam"] + "</option>";
+    }
+    output += "</select>";
+
+    return output;
+  }
+  function outputSpeler(array) {
+    return array["naam"] + "<input type='hidden' name='' id='' value='" + array["ID"] + "'>";
+  }
+
+  function inputSets() {
+    var string = "";
+    string +=
+      "<td><input style='width:30px' type='input' size='1'></td><td><input style='width:30px' type='input' size='1' ></td>";
+    string +=
+      "<td><input style='width:30px' type='input' size='1'></td><td><input style='width:30px' type='input' size='1' ></td>";
+    string +=
+      "<td><input style='width:30px' type='input' size='1'></td><td><input style='width:30px' type='input' size='1' ></td>";
+    return string;
+  }
+  function BerekenHandicap(array) {
+    handicap = 0;
+    for (j = 0; j < array.length; j = j + 3) {
+      array[j]["handicap"] = handicap;
+      if (j + 1 < array.length) {
+        array[j + 1]["handicap"] = handicap;
+      }
+      if (j + 2 < array.length) {
+        array[j + 2]["handicap"] = handicap;
+      }
+
+      handicap++;
+    }
+    return array;
+  }
+
+  function MaakSpelersArrayRandom(array) {
+    //Fisher-Yates algorithm
+    //Kindly lend from http://stackoverflow.com/questions/2450954/how-to-randomize-a-javascript-array
+
+    var currentIndex = array.length,
+      temporaryValue,
+      randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+  }
+
+  function selectSpeler(nummer) {
+    var speler = new Array();
+    var dropSelect = document.getElementById("select_" + nummer);
+    speler["ID"] = dropSelect.options[dropSelect.selectedIndex].value;
+    speler["naam"] = dropSelect.options[dropSelect.selectedIndex].value;
+    document.getElementById("span_" + nummer).innerHTML = outputSpeler(speler);
+    document.getElementById("knop_" + nummer).disabled = true;
+  }
+
+  var buttonSpelerslijst = document.getElementById("knopToonSpelers"); // Assumes element with id='button'
+
+  buttonSpelerslijst.onclick = function () {
+    var div = document.getElementById("spelerslijst");
+    if (div.style.display !== "none") {
+      div.style.display = "none";
+    } else {
+      div.style.display = "block";
+    }
+  };
+
+  function telAanwezigen() {
+    var aanwezigeSpelers = 0;
+    for (
+      var i = 0;
+      i < document.getElementById("spelerslijst").getElementsByTagName("INPUT").length;
+      i++
+    ) {
+      if (
+        document.getElementById("spelerslijst").getElementsByTagName("INPUT")[i].type == "checkbox"
+      ) {
+        if (document.getElementById("spelerslijst").getElementsByTagName("INPUT")[i].checked) {
+          aanwezigeSpelers++;
+        }
+      }
+    }
+    alert("Er zijn " + aanwezigeSpelers + " spelers aanwezig.");
+  }
+
+  function voegSpelerToe(rijObject, id) {
+    var voornaam = document.getElementById("voornaam_" + id).value;
+    var achternaam = document.getElementById("naam_" + id).value;
+    var naam = voornaam + " " + achternaam;
+    var ID = Math.floor(Math.random() * 2000) + 1000;
+    rijObject.innerHTML =
+      "<label><input type='checkbox' name='" +
+      voornaam +
+      " " +
+      achternaam +
+      "' value='" +
+      ID +
+      "'/> " +
+      naam +
+      "</label>";
+  }
+</script>
