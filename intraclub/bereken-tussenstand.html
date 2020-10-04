@@ -1,0 +1,32 @@
+<h3 class="display-4" style="text-align: center;">Bereken tussenstand</h3>
+
+<div id="success" class="alert alert-success" style="display: none;"></div>
+<div id="errors" class="alert alert-danger" style="display: none;"></div>
+        
+
+<script type="text/javascript">
+    window.onload = function() {
+        document.getElementsByClassName("article-details")[0].style.display = "none";
+    }
+    jQuery.ajax({
+        type: "POST",
+        url: "/intraclub-api/index.php/seasons/calculate",
+        success: function(result) {
+            document.getElementById("errors").innerHTML = "";
+            document.getElementById("errors").style.display = "none"; 
+            document.getElementById("success").innerText = "Tussenstand werd berekend!";
+            document.getElementById("success").style.display = "block"; 
+        },
+        error: function(result) {
+            document.getElementById("errors").innerHTML = "";
+            var list = document.createElement('ul');
+            for(var i=0; i < result.responseJSON.length; i++){
+                var li = document.createElement('li');
+                li.textContent = result.responseJSON[i];
+                list.appendChild(li);
+            }
+            document.getElementById("errors").appendChild(list);
+            document.getElementById("errors").style.display = "block"; 
+        }
+    });
+</script>

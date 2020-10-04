@@ -67,6 +67,8 @@
   }
 </style>
 <h3 class="display-4" style="text-align: center;">Intraclub</h3>
+<div id="speeldag-info" class="alert alert-secondary" style="display: none;">
+</div>
 <div id="container">
   <ul class="tabs">
     <li class="tab-link current" data-tab="tab-1">Algemeen</li>
@@ -150,6 +152,14 @@
   </div>
 </div>
 <script type="text/javascript">
+  jQuery.getJSON("/intraclub-api/index.php/rounds/latest", function (data) {
+    if(data != false){
+      document.getElementById("speeldag-info").innerHTML ="<a href='/intraclub/speeldag?speeldagId=" + data.id + "'>" +
+        "Stand na speeldag " + data.roundNumber + " op " + formatDate(data.date) + "</a>";
+      document.getElementById("speeldag-info").style.display = "block";
+    }
+  });
+
   jQuery.getJSON("/intraclub-api/index.php/rankings", function (data) {
     generateRanking(data.general, data.seasonId, "tab-1");
     generateRanking(data.women, data.seasonId, "tab-2");

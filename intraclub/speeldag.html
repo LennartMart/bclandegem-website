@@ -77,9 +77,9 @@
       if (data.id) {
         //setting info
         document.getElementById("speeldag-info").innerText = "Speeldag " + data.number;
-        document.getElementById("speeldag-datum").innerHTML += new Date(
+        document.getElementById("speeldag-datum").innerHTML += formatDate(
           data.date
-        ).toLocaleDateString();
+        );
         document.getElementById("speeldag-gemiddelde").innerText =
           "Gemiddelde afwezigen: " + data.averageAbsent;
         document.getElementById("wedstrijdenTitel").style.display = "flex";
@@ -146,5 +146,11 @@
     let cell = row.insertCell();
     cell.className = className;
     cell.innerHTML = cellText;
+  }
+  function formatDate(date) {
+    dateObject = new Date(date);
+    return (
+      dateObject.getDate() + "/" + (dateObject.getMonth() + 1) + "/" + dateObject.getFullYear()
+    );
   }
 </script>
