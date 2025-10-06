@@ -66,9 +66,8 @@
     cursor: pointer;
   }
 </style>
-<h3 class="display-4" style="text-align: center;">Intraclub</h3>
-<div id="speeldag-info" class="alert alert-secondary" style="display: none;">
-</div>
+<h3 class="display-4" style="text-align: center">Intraclub</h3>
+<div id="speeldag-info" class="alert alert-secondary" style="display: none"></div>
 <div id="container">
   <ul class="tabs">
     <li class="tab-link current" data-tab="tab-1">Algemeen</li>
@@ -152,28 +151,35 @@
   </div>
 </div>
 <script type="text/javascript">
-  jQuery.getJSON("/intraclub-api/index.php/rounds/latest", function (data) {
-    if(data != false){
-      document.getElementById("speeldag-info").innerHTML ="<a href='/intraclub/speeldag?speeldagId=" + data.id + "'>" +
-        "Stand na speeldag " + data.roundNumber + " op " + formatDate(data.date) + "</a>";
+  jQuery.getJSON("/intra-app/api/index.php/rounds/latestCalculated", function (data) {
+    if (data != false) {
+      document.getElementById("speeldag-info").innerHTML =
+        "<a href='/intraclub/speeldag?speeldagId=" +
+        data.id +
+        "'>" +
+        "Stand na speeldag " +
+        data.number +
+        " op " +
+        formatDate(data.date) +
+        "</a>";
       document.getElementById("speeldag-info").style.display = "block";
     }
   });
 
-  jQuery.getJSON("/intraclub-api/index.php/rankings", function (data) {
+  jQuery.getJSON("/intra-app/api/index.php/rankings", function (data) {
     generateRanking(data.general, data.seasonId, "tab-1");
     generateRanking(data.women, data.seasonId, "tab-2");
     generateRanking(data.recreants, data.seasonId, "tab-3");
     generateRanking(data.veterans, data.seasonId, "tab-4");
   });
-  jQuery.getJSON("/intraclub-api/index.php/rounds", function (data) {
+  jQuery.getJSON("/intra-app/api/index.php/rounds", function (data) {
     trHtml = "";
     jQuery.each(data.reverse(), function (i, item) {
       trHtml +=
         "<tr><td><a href='/intraclub/speeldag?speeldagId=" +
         item.id +
         "'>" +
-        item.roundNumber +
+        item.number +
         "</a></td><td><a href='/intraclub/speeldag?speeldagId=" +
         item.id +
         "'>" +
@@ -190,7 +196,7 @@
     });
     jQuery("#tab-5 table").append(trHtml);
   });
-  jQuery.getJSON("/intraclub-api/index.php/seasons/latest/statistics", function (data) {
+  jQuery.getJSON("/intra-app/api/index.php/seasons/latest/statistics", function (data) {
     var sortedPresence = data.sort(function (a, b) {
       if (a.statistics.rounds.present === b.statistics.rounds.present) {
         return b.statistics.matches.won - a.statistics.matches.won;

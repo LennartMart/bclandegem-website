@@ -27,11 +27,57 @@
     padding: 0.75rem;
     vertical-align: top;
   }
-  .match-thuis {
-    text-align: right;
+  .match-players {
+    text-align: center;
+    font-weight: bold;
+    background-color: #f5f5f5;
   }
-  .match-uit {
+  .sets-column {
+    min-width: 400px;
+  }
+  .set-details {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  .set-details:last-child {
+    border-bottom: none;
+  }
+  .set-header {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+  .set-pairing {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 3px 0;
+  }
+  .team-left,
+  .team-right {
+    flex: 1;
+    font-size: 16px;
+  }
+  .team-left {
+    text-align: right;
+    padding-right: 10px;
+  }
+  .team-right {
     text-align: left;
+    padding-left: 10px;
+  }
+  .vs {
+    font-weight: bold;
+    color: #eb0000;
+    padding: 0 10px;
+    font-size: 14px;
+  }
+  .score {
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-top: 3px;
   }
   #wedstrijdenTitel {
     display: none;
@@ -41,34 +87,39 @@
   }
   #wedstrijdenSpeeldagDiv {
     display: none;
-    justify-content: center;
     overflow-x: auto;
   }
+  #wedstrijdenSpeeldag {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0 auto;
+  }
 </style>
-<div id="speeldag-informatie" style="margin: 5px 5px;">
+<div id="speeldag-informatie" style="margin: 5px 5px">
   <div id="speeldag-intro">
     <div>
       <div id="speeldag-info"></div>
-      <div id="speeldag-datum"><i class="far fa-calendar-alt" style="margin-right: 5px;"></i></div>
+      <div id="speeldag-datum"><i class="far fa-calendar-alt" style="margin-right: 5px"></i></div>
       <div id="speeldag-gemiddelde"></div>
     </div>
   </div>
   <div id="wedstrijdenTitel">Wedstrijden</div>
   <div id="wedstrijdenSpeeldagDiv">
     <table id="wedstrijdenSpeeldag">
-      <tr>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>
+      <tbody>
+        <tr>
+          <th>Spelers</th>
+          <th>Sets</th>
+        </tr>
+      </tbody>
     </table>
   </div>
 </div>
-<script>
+<script type="text/javascript">
   const urlParams = new URLSearchParams(window.location.search);
   const speeldagId = urlParams.get("speeldagId");
   var request = new XMLHttpRequest();
-  request.open("GET", "/intraclub-api/index.php/rounds/" + speeldagId, true);
+  request.open("GET", "/intra-app/api/index.php/rounds/" + speeldagId, true);
 
   request.onload = function () {
     if (this.status >= 200 && this.status < 400) {
@@ -77,9 +128,7 @@
       if (data.id) {
         //setting info
         document.getElementById("speeldag-info").innerText = "Speeldag " + data.number;
-        document.getElementById("speeldag-datum").innerHTML += formatDate(
-          data.date
-        );
+        document.getElementById("speeldag-datum").innerHTML += formatDate(data.date);
         document.getElementById("speeldag-gemiddelde").innerText =
           "Gemiddelde afwezigen: " + data.averageAbsent;
         document.getElementById("wedstrijdenTitel").style.display = "flex";
@@ -97,35 +146,78 @@
     document.getElementById("speeldag-informatie").innerText = "De info kon niet geladen worden";
   };
   request.send();
+
   function genereerMatchTabel(table, data) {
     for (let element of data) {
       let row = table.insertRow();
-      insertCell(
-        row,
-        bouwVolledigeNaam(element.home.firstPlayer).concat(
-          bouwVolledigeNaam(element.home.secondPlayer)
-        ),
-        "match-thuis"
-      );
-      insertCell(
-        row,
-        bouwVolledigeNaam(element.away.firstPlayer) + bouwVolledigeNaam(element.away.secondPlayer),
-        "match-uit"
-      );
 
-      var setRow =
-        "<span class='score'> <span>" +
-        bouwSet(element.firstSet) +
-        "</span> <span>" +
-        bouwSet(element.secondSet) +
-        "</span>";
-      if (element.thirdSet.played) {
-        setRow = setRow + " <span>" + bouwSet(element.thirdSet) + "</span>";
-      }
-      setRow = setRow + "</span>";
-      insertCell(row, setRow, "set");
+      // Get player references
+      const player1 = element.firstPlayer;
+      const player2 = element.secondPlayer;
+      const player3 = element.thirdPlayer;
+      const player4 = element.fourthPlayer;
+
+      // Players cell - show all 4 players
+      const playersHtml = `
+        <div>
+          ${bouwSpelerNaam(player1)}<br>
+          ${bouwSpelerNaam(player2)}<br>
+          ${bouwSpelerNaam(player3)}<br>
+          ${bouwSpelerNaam(player4)}
+        </div>
+      `;
+      insertCell(row, playersHtml, "match-players");
+
+      // Sets details cell
+      let setsHtml = "";
+
+      // Set 1: P1+P2 vs P3+P4
+      setsHtml += `
+        <div class="set-details">
+          <div class="set-header">Set 1</div>
+          <div class="set-pairing">
+            <div class="team-left">${bouwSpelerNaam(player1)} & ${bouwSpelerNaam(player2)}</div>
+            <div class="vs">vs</div>
+            <div class="team-right">${bouwSpelerNaam(player3)} & ${bouwSpelerNaam(player4)}</div>
+          </div>
+          <div class="score">${bouwSet(element.firstSet)}</div>
+        </div>
+      `;
+
+      // Set 2: P1+P3 vs P2+P4
+      setsHtml += `
+        <div class="set-details">
+          <div class="set-header">Set 2</div>
+          <div class="set-pairing">
+            <div class="team-left">${bouwSpelerNaam(player1)} & ${bouwSpelerNaam(player3)}</div>
+            <div class="vs">vs</div>
+            <div class="team-right">${bouwSpelerNaam(player2)} & ${bouwSpelerNaam(player4)}</div>
+          </div>
+          <div class="score">${bouwSet(element.secondSet)}</div>
+        </div>
+      `;
+
+      // Set 3: P1+P4 vs P2+P3
+      setsHtml += `
+        <div class="set-details">
+          <div class="set-header">Set 3</div>
+          <div class="set-pairing">
+            <div class="team-left">${bouwSpelerNaam(player1)} & ${bouwSpelerNaam(player4)}</div>
+            <div class="vs">vs</div>
+            <div class="team-right">${bouwSpelerNaam(player2)} & ${bouwSpelerNaam(player3)}</div>
+          </div>
+          <div class="score">${bouwSet(element.thirdSet)}</div>
+        </div>
+      `;
+
+      insertCell(row, setsHtml, "sets-column");
     }
   }
+
+  function bouwSpelerNaam(player) {
+    return `<a href='/intraclub/speler?spelerId=${player.id}'>${player.firstName} ${player.name}</a>`;
+  }
+
   function bouwVolledigeNaam(player) {
     var spelerLink = "<div";
     spelerLink =
